@@ -13,17 +13,14 @@ class Weight extends Component {
 			labels: [],
 			points: [],
 		};
-		
 	}
 
 	componentDidMount() {
-		
 	}
 
 	componentDidUpdate(prevProps){
 		if (prevProps.userData !== this.props.userData) {
 			this.prepareData(this.props.userData);
-			console.log('Updating child');
 		}
 	}
 

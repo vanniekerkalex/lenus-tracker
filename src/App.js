@@ -5,51 +5,17 @@ import { Container, Row, Col, Tabs, Tab } from 'react-bootstrap';
 import Measure from './common/components/Measure';
 import Weight from './common/components/Weight';
 import Bodyfat from './common/components/Bodyfat';
+import seedUserData from './common/seedUserData';
 
 class App extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			dateInfo: {
-				msg: "John",
-			},
 			newUser: false,
 			measure: {
 			},
-			seedUserData: {
-				height: 181,
-				measurements: [
-					{
-						date: '2021-08-01',
-						weight: 85,
-						waist: 82,
-						neck: 40,
-						bodyfat: 11.89,
-					},
-					{
-						date: '2021-08-02',
-						weight: 86,
-						waist: 82,
-						neck: 40,
-						bodyfat: 11.89,
-					},
-					{
-						date: '2021-08-03',
-						weight: 87,
-						waist: 82,
-						neck: 40,
-						bodyfat: 11.89,
-					},
-					{
-						date: '2021-08-04',
-						weight: 88,
-						waist: 82,
-						neck: 40,
-						bodyfat: 11.89,
-					},
-				]
-			},
+			seedUserData: seedUserData,
 			userData: {
 				height: 0,
 				measurements: []
@@ -67,7 +33,8 @@ class App extends Component {
 
 	async componentDidMount() {
 
-		// this.seedUserData();
+		// this.seedUserData(); // Load user data for testing
+		// this.clearSeedData(); // Cleat local storage of user data
 
 		const userData = JSON.parse(localStorage.getItem('userData'));
 		if (userData && userData.measurements && userData.measurements.length > 0) {
@@ -81,8 +48,6 @@ class App extends Component {
 				newUser: true
 			});
 		}
-
-		console.log('App > mounted', this.state.userData.measurements)
 	};
 
 	saveNewMeasurement = async (newMeasurment) => {
@@ -98,26 +63,34 @@ class App extends Component {
 		await this.setState(prevState => {
 			let userData = Object.assign({}, prevState.userData);
 			userData.measurements = newArray;
+			userData.height = newMeasurment.height;
 			return { userData };
 		})
 
 		localStorage.setItem('userData', JSON.stringify(this.state.userData));
-		console.log('App > after save', this.state.userData.measurements)
 	}
 
 	deleteMeasurement = async () => {
+		
 		console.log('App > before delete', this.state.userData.measurements)
-		const newArray = [...this.state.userData.measurements];
+		const today = (new Date().toISOString().split('T')[0]);
 
-		newArray.splice(this.state.userData.measurements.length - 1);
-		await this.setState(prevState => {
-			let userData = Object.assign({}, prevState.userData);
-			userData.measurements = newArray;
-			return { userData };
-		})
+		if (this.state.userData.measurements && this.state.userData.measurements.length === 1) {
+			localStorage.removeItem('userData');
+		} else if (this.state.userData.measurements 
+			&& this.state.userData.measurements.length > 0 
+			&& this.state.userData.measurements[this.state.userData.measurements.length - 1].date === today) {
+				const newArray = [...this.state.userData.measurements];
+				newArray.splice(this.state.userData.measurements.length - 1);
 
-		localStorage.setItem('userData', JSON.stringify(this.state.userData));
-		console.log('App > after delete', this.state.userData.measurements)
+				await this.setState(prevState => {
+					let userData = Object.assign({}, prevState.userData);
+					userData.measurements = newArray;
+					return { userData };
+				})
+
+				localStorage.setItem('userData', JSON.stringify(this.state.userData));
+			}
 	}
 
 	render() {
@@ -138,11 +111,7 @@ class App extends Component {
 								<Weight userData={this.state.userData} />
 							</Tab>
 							<Tab eventKey="bodyfat" title="Bodyfat" >
-								<Bodyfat />
-							</Tab>
-							<Tab eventKey="settings" title="Settings" >
-								{/* <Measure dateInfo={this.state.dateInfo} saveNewMeasurement={this.saveNewMeasurement} /> */}
-								<p>Set height of the user, delete user aka clear data.</p>
+								<Bodyfat userData={this.state.userData} />
 							</Tab>
 						</Tabs>
 					</Col>

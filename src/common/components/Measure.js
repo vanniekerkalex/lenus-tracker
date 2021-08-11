@@ -23,32 +23,19 @@ class Measure extends Component {
 	componentDidMount() {
 	}
 
-	// componentDidUpdate(){
-	// 	if (!this.state.loaded && this.props.userData.measurements && this.props.userData.measurements.length > 0
-	// 			&& this.props.userData.measurements[this.props.userData.measurements.length - 1].date.toString() === (this.state.date.toISOString().split('T')[0])) {
-
-	// 		this.setState({
-	// 			height: this.props.userData.height,
-	// 			weight: this.props.userData.measurements[this.props.userData.measurements.length - 1].weight,
-	// 			waist: this.props.userData.measurements[this.props.userData.measurements.length - 1].waist,
-	// 			neck: this.props.userData.measurements[this.props.userData.measurements.length - 1].neck,
-	// 			loaded: true,
-	// 		});
-	// 	}
-	// }
-
 	async componentDidUpdate(prevProps){
 		if (prevProps.userData !== this.props.userData) {
-			if (this.props.userData.measurements && this.props.userData.measurements.length > 0
-				&& this.props.userData.measurements[this.props.userData.measurements.length - 1].date.toString() === (this.state.date.toISOString().split('T')[0])) {
+			if (this.props.userData.measurements && this.props.userData.measurements.length > 0){
+				// This is to check if the dates match up, but prefilling is best for ease of updating values.
+				//&& this.props.userData.measurements[this.props.userData.measurements.length - 1].date.toString() === (this.state.date.toISOString().split('T')[0])) {
 
-			await this.setState({
-				height: this.props.userData.height,
-				weight: this.props.userData.measurements[this.props.userData.measurements.length - 1].weight,
-				waist: this.props.userData.measurements[this.props.userData.measurements.length - 1].waist,
-				neck: this.props.userData.measurements[this.props.userData.measurements.length - 1].neck,
-			});
-		}
+				await this.setState({
+					height: this.props.userData.height,
+					weight: this.props.userData.measurements[this.props.userData.measurements.length - 1].weight,
+					waist: this.props.userData.measurements[this.props.userData.measurements.length - 1].waist,
+					neck: this.props.userData.measurements[this.props.userData.measurements.length - 1].neck,
+				});
+			}
 		}
 	}
 
@@ -67,7 +54,8 @@ class Measure extends Component {
 
 	saveMeasurement = (props) => {
 		const newMeasurement = {
-			date: (new Date(this.state.date).toISOString().split('T')[0]),
+			date: (new Date().toISOString().split('T')[0]),
+			height: parseFloat(this.state.height),
 			weight: parseFloat(this.state.weight),
 			waist: parseFloat(this.state.waist),
 			neck: parseFloat(this.state.neck),
@@ -76,13 +64,14 @@ class Measure extends Component {
 		this.props.saveNewMeasurement(newMeasurement);
 	}
 
-	deleteMeasurement = (props) => {
-		this.setState({
+	deleteMeasurement = async (props) => {
+		await this.props.deleteMeasurement();
+		await this.setState({
 			weight: 0,
 			waist: 0,
 			neck: 0,
 		});
-		this.props.deleteMeasurement();
+		
 	}
 
 	changeDateSelected = (date) => {
@@ -100,8 +89,6 @@ class Measure extends Component {
 						disabled
 						className="form-control text-center"
 						selected={this.state.date}
-						// onChange={this.onInputChange}
-						// onChange={(date) => this.setState({ date: date })}
 						onChange={(date) => this.changeDateSelected(date)}
 					/>
 				</div>
@@ -111,6 +98,7 @@ class Measure extends Component {
 						<Row className="mt-3">
 							<Col>
 							<InputGroup className="mb-3">
+									<InputGroup.Text className="measure-info-front">Weight</InputGroup.Text>
 									<FormControl
 										placeholder="Weight"
 										aria-label="Weight"
@@ -120,13 +108,14 @@ class Measure extends Component {
 										name="weight"
 										value={this.state.weight}
 									/>
-									<InputGroup.Text id="basic-addon2">kg</InputGroup.Text>
+									<InputGroup.Text id="basic-addon2" className="measure-info-back">kg</InputGroup.Text>
 								</InputGroup>
 							</Col>
 						</Row>
 						<Row className="mt-3">
 							<Col>
 							<InputGroup className="mb-3">
+								<InputGroup.Text className="measure-info-front">Waist</InputGroup.Text>
 									<FormControl
 										placeholder="Waist"
 										aria-label="Waist"
@@ -136,13 +125,14 @@ class Measure extends Component {
 										name="waist"
 										value={this.state.waist}
 									/>
-									<InputGroup.Text id="basic-addon2">cm</InputGroup.Text>
+									<InputGroup.Text id="basic-addon2" className="measure-info-back">cm</InputGroup.Text>
 								</InputGroup>
 							</Col>
 						</Row>
 						<Row className="mt-3">
 							<Col>
 							<InputGroup className="mb-3">
+									<InputGroup.Text className="measure-info-front">Neck</InputGroup.Text>
 									<FormControl
 										placeholder="Neck"
 										aria-label="Neck"
@@ -152,7 +142,24 @@ class Measure extends Component {
 										name="neck"
 										value={this.state.neck}
 									/>
-									<InputGroup.Text id="basic-addon2">cm</InputGroup.Text>
+									<InputGroup.Text id="basic-addon2" className="measure-info-back">cm</InputGroup.Text>
+								</InputGroup>
+							</Col>
+						</Row>
+						<Row className="mt-3">
+							<Col>
+							<InputGroup className="mb-3">
+									<InputGroup.Text className="measure-info-front">Height</InputGroup.Text>
+									<FormControl
+										placeholder="Height"
+										aria-label="Height"
+										aria-describedby="basic-addon2"
+										type="number"
+										onChange={this.onInputChange}
+										name="height"
+										value={this.state.height}
+									/>
+									<InputGroup.Text id="basic-addon2" className="measure-info-back">cm</InputGroup.Text>
 								</InputGroup>
 							</Col>
 						</Row>
