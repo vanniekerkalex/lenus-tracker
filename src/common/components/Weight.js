@@ -20,8 +20,19 @@ class Weight extends Component {
 
 	componentDidUpdate(prevProps){
 		if (prevProps.userData !== this.props.userData) {
-			this.prepareData(this.props.userData);
+			if (this.props.userData.measurements) {
+				this.prepareData(this.props.userData);
+			} else {
+				this.clearData();
+			}
 		}
+	}
+
+	clearData = () => {
+		this.setState({
+			labels: [],
+			points: [],
+		});
 	}
 
 	prepareData = (userData) => {
@@ -70,7 +81,7 @@ class Weight extends Component {
 		};
 
 		return (
-			<Container className="mt-3">
+			<Container className="mt-3 p-0">
 				<br></br>
 				<h3>Weight Progress</h3>
 

@@ -9,13 +9,11 @@ class Measure extends Component {
 
 		this.state = {
 			date: new Date(),
-			loaded: false,
 			weight: 0,
 			waist: 0,
 			neck: 0,
 			bodyfat: 0,
 			userData: {},
-			height: 0,
 		};
 
 	}
@@ -23,18 +21,17 @@ class Measure extends Component {
 	componentDidMount() {
 	}
 
-	async componentDidUpdate(prevProps){
+	componentDidUpdate(prevProps){
 		if (prevProps.userData !== this.props.userData) {
 			if (this.props.userData.measurements && this.props.userData.measurements.length > 0){
-				// This is to check if the dates match up, but prefilling is best for ease of updating values.
-				//&& this.props.userData.measurements[this.props.userData.measurements.length - 1].date.toString() === (this.state.date.toISOString().split('T')[0])) {
-
-				await this.setState({
-					height: this.props.userData.height,
+				this.setState({
 					weight: this.props.userData.measurements[this.props.userData.measurements.length - 1].weight,
 					waist: this.props.userData.measurements[this.props.userData.measurements.length - 1].waist,
 					neck: this.props.userData.measurements[this.props.userData.measurements.length - 1].neck,
+					height: this.props.userData.height,
 				});
+			} else {
+				this.resetStateValues();
 			}
 		}
 	}
@@ -43,9 +40,9 @@ class Measure extends Component {
 		const name = event.target.name;
 		const value = event.target.value;
 		this.setState({
-		  [name]: value
-		});
-	  };
+			[name]: value
+			});
+	};
 
 	calculateBodyfat(height, waist, neck) {
 		const bodyfat = 495/(1.0324-0.19077*(Math.log10(waist-neck))+0.15456*(Math.log10(height)))-450;
@@ -53,34 +50,35 @@ class Measure extends Component {
 	}
 
 	saveMeasurement = (props) => {
+		const weight = parseFloat(this.state.weight) || 0;
+		const waist = parseFloat(this.state.waist) || 0;
+		const neck = parseFloat(this.state.neck) || 0;
+
 		const newMeasurement = {
 			date: (new Date().toISOString().split('T')[0]),
-			height: parseFloat(this.state.height),
-			weight: parseFloat(this.state.weight),
-			waist: parseFloat(this.state.waist),
-			neck: parseFloat(this.state.neck),
-			bodyfat: parseFloat(this.calculateBodyfat(this.state.height, this.state.waist, this.state.neck)),
+			weight: parseFloat(weight),
+			waist: parseFloat(waist),
+			neck: parseFloat(neck),
+			bodyfat: parseFloat(this.calculateBodyfat(this.state.height, waist, neck)),
 		}
 		this.props.saveNewMeasurement(newMeasurement);
 	}
 
-	deleteMeasurement = async (props) => {
-		await this.props.deleteMeasurement();
-		await this.setState({
+	deleteMeasurement = (props) => {
+		this.props.deleteMeasurement();
+	}
+
+	resetStateValues = () => {
+		this.setState({
 			weight: 0,
 			waist: 0,
 			neck: 0,
 		});
-		
-	}
-
-	changeDateSelected = (date) => {
-		this.setState({ date: date });
 	}
 
 	render() {
 		return (
-			<Container className="mt-3">
+			<Container className="mt-3 p-0">
 				<br></br>
 				<h3>Add Measurement</h3>
 
@@ -89,7 +87,6 @@ class Measure extends Component {
 						disabled
 						className="form-control text-center"
 						selected={this.state.date}
-						onChange={(date) => this.changeDateSelected(date)}
 					/>
 				</div>
 
@@ -141,23 +138,6 @@ class Measure extends Component {
 										onChange={this.onInputChange}
 										name="neck"
 										value={this.state.neck}
-									/>
-									<InputGroup.Text id="basic-addon2" className="measure-info-back">cm</InputGroup.Text>
-								</InputGroup>
-							</Col>
-						</Row>
-						<Row className="mt-3">
-							<Col>
-							<InputGroup className="mb-3">
-									<InputGroup.Text className="measure-info-front">Height</InputGroup.Text>
-									<FormControl
-										placeholder="Height"
-										aria-label="Height"
-										aria-describedby="basic-addon2"
-										type="number"
-										onChange={this.onInputChange}
-										name="height"
-										value={this.state.height}
 									/>
 									<InputGroup.Text id="basic-addon2" className="measure-info-back">cm</InputGroup.Text>
 								</InputGroup>
