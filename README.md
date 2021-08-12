@@ -5,7 +5,7 @@ This app starts by having the user enter their height. This will be used for bod
 
 The tabs `Weight` and `Bodyfat` will graph the user's progress day by day according to date.
 
-On the `Settings` tab, the user can also `Clear Data` or `Seed User Data` for testing. If there have been previous daily measurements taken, when the user wants to add a new measurement, the previous values will be prefilled for ease of use as changes are usually not drastic.
+On the `Settings` tab, the user can also `Clear Data` or `Seed User Data` for testing. When the user wants to add a daily measurement, the previously recorded values will be prefilled for ease of use as changes are usually not drastic.
 
 # Getting Started
 
