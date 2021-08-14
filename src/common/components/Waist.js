@@ -3,7 +3,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Line } from 'react-chartjs-2';
 
-class Bodyfat extends Component {
+class Waist extends Component {
 	constructor(props) {
 		super(props);
 
@@ -26,7 +26,7 @@ class Bodyfat extends Component {
 
 	prepareData = (userData) => {
 		const labels = userData.measurements.map(item => item.date);
-		const points = userData.measurements.map(item => item.bodyfat);
+		const points = userData.measurements.map(item => item.waist);
 
 		this.setState({
 			labels: labels,
@@ -42,8 +42,8 @@ class Bodyfat extends Component {
 			  {
 				data: this.state.points,
 					fill: false,
-					backgroundColor: 'rgb(59, 137, 4)',
-					borderColor: 'rgba(59, 137, 4, 0.2)',
+					backgroundColor: 'rgb(0, 30, 201)',
+					borderColor: 'rgba(0, 30, 201, 0.2)',
 				},
 			],
 		};
@@ -80,7 +80,7 @@ class Bodyfat extends Component {
 		return (
 			<Container className="mt-3 p-0">
 				<br></br>
-				<h3>Bodyfat Progress [%]</h3>
+				<h3>Waist Progress [cm]</h3>
 
 				<Row className="mt-3 justify-content-center">
 					<Col className="">
@@ -91,4 +91,4 @@ class Bodyfat extends Component {
 		);
 	}
 }
-export default Bodyfat;
+export default Waist;

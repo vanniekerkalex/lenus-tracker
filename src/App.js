@@ -5,6 +5,7 @@ import { Container, Row, Col, Tabs, Tab } from 'react-bootstrap';
 import Measure from './common/components/Measure';
 import Weight from './common/components/Weight';
 import Bodyfat from './common/components/Bodyfat';
+import Waist from './common/components/Waist';
 import Settings from './common/components/Settings';
 import seedUserData from './common/seedUserData';
 
@@ -41,10 +42,11 @@ class App extends Component {
 	};
 
 	seedUserData = async () => {
-		localStorage.setItem('userData', JSON.stringify(this.state.seedUserData));
+		await this.clearData();
 		await this.setState({
 			userData: {...this.state.seedUserData}
 		});
+		localStorage.setItem('userData', JSON.stringify(this.state.seedUserData));
 		console.log('User seed data has been loaded.')
 	}
 
@@ -102,6 +104,9 @@ class App extends Component {
 							</Tab>
 							<Tab eventKey="bodyfat" title="Bodyfat" disabled={this.state.userData.height === 0}  >
 								<Bodyfat userData={this.state.userData} />
+							</Tab>
+							<Tab eventKey="waist" title="Waist" disabled={this.state.userData.height === 0}  >
+								<Waist userData={this.state.userData} />
 							</Tab>
 							<Tab eventKey="settings" title="Settings" >
 								<Settings 

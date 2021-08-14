@@ -2,14 +2,16 @@ import { React, Component } from "react";
 import { Container, Row, Col, Button, InputGroup, FormControl } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import {convertDateToString} from '../convertDateToString.js';
 
 class Measure extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
+			date: new Date((new Date()).toDateString()),
 			newEntry: {
-				date: new Date((new Date()).toDateString()),
+				date: convertDateToString(new Date()),
 				weight: 0,
 				waist: 0,
 				neck: 0,
@@ -48,17 +50,22 @@ class Measure extends Component {
 	deleteMeasurement = async () => {
 		await this.resetStateValues();
 
+		const selectedDate = new Date(this.state.newEntry.date).getTime();
 		const measurements = [...this.state.userData.measurements];
-		const index = measurements.findIndex((item) => this.state.newEntry.date.getTime() === new Date(item.date).getTime());
-		measurements.splice(index);
+		const index = measurements.findIndex((item) => selectedDate === new Date(item.date).getTime());
 
-		await this.setState(prevState => {
-			let userData = Object.assign({}, prevState.userData);
-			userData.measurements = measurements;
-			return { userData };
-		})
+		
+		if (index !== -1) {
+			measurements.splice(index, 1);
 
-		this.props.persistUserData(this.state.userData);
+			await this.setState(prevState => {
+				let userData = Object.assign({}, prevState.userData);
+				userData.measurements = [...measurements];
+				return { userData };
+			})
+
+			this.props.persistUserData(this.state.userData);
+		}
 	}
 
 	resetStateValues = async () => {
@@ -74,16 +81,21 @@ class Measure extends Component {
 	changeDateSelected = async (date) => {
 		await this.setState(prevState => {
 			let newEntry = Object.assign({}, prevState.newEntry);
-			newEntry.date = new Date(date.toDateString());
+			newEntry.date = convertDateToString(date);
 			return { newEntry };
+		})
+		
+		await this.setState({
+			date: date
 		})
 
 		this.loadDateSelectedData();
 	}
 
 	loadDateSelectedData = () => {
+		const selectedDate = new Date(this.state.newEntry.date).getTime();
 		const measurements = [...this.state.userData.measurements];
-		const index = measurements.findIndex((item) => new Date(item.date).getTime() === this.state.newEntry.date.getTime());
+		const index = measurements.findIndex((item) => selectedDate === new Date(item.date).getTime());
 
 		if (index === -1) {
 			this.resetStateValues();
@@ -125,20 +137,21 @@ class Measure extends Component {
 		await this.parseEnteredValues();
 		this.storeBodyfat();
 
+		const selectedDate = new Date(this.state.newEntry.date).getTime();
 		const measurements = [...this.state.userData.measurements];
-		const index = measurements.findIndex((item) => this.state.newEntry.date.getTime() >= new Date(item.date).getTime());
+		const index = measurements.findIndex((item) => selectedDate <= new Date(item.date).getTime());
 		const updatedMeasurements = [...measurements];
 
 		if (index === -1) { // New entry not bigger or equal to any, insert in the front.
-			updatedMeasurements.unshift(this.state.newEntry);
+			updatedMeasurements.push(this.state.newEntry);
 		} else { // Found a suitable place, add or update
-			if (this.state.newEntry.date.getTime() === new Date(measurements[index].date).getTime()) { // Entry exists, update
+			if (selectedDate === new Date(measurements[index].date).getTime()) { // Entry exists, update
 				updatedMeasurements[index] = this.state.newEntry
-			} else if (this.state.newEntry.date.getTime() > new Date(measurements[index].date).getTime()) { // Entry doesn't exist, insert
-				updatedMeasurements.splice(index + 1, 0, this.state.newEntry);
+			} else if (selectedDate < new Date(measurements[index].date).getTime()) { // Entry doesn't exist, insert
+				updatedMeasurements.splice(index, 0, this.state.newEntry);
 			}
 		}
-		
+
 		await this.setState(prevState => {
 			let userData = Object.assign({}, prevState.userData);
 			userData.measurements = updatedMeasurements;
@@ -158,7 +171,7 @@ class Measure extends Component {
 					<DatePicker 
 						dateFormat="dd/MM/yyyy"
 						className="form-control text-center"
-						selected={this.state.newEntry.date}
+						selected={this.state.date}
 						onChange={(date) => this.changeDateSelected(date)}
 					/>
 				</div>
