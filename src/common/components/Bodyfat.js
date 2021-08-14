@@ -83,7 +83,7 @@ class Bodyfat extends Component {
 		return (
 			<Container className="mt-3 p-0">
 				<br></br>
-				<h3>Bodyfat Progress</h3>
+				<h3>Bodyfat Progress [%]</h3>
 
 				<Row className="mt-3 justify-content-center">
 					<Col className="">

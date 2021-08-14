@@ -14,19 +14,13 @@ class Measure extends Component {
 
 	componentDidUpdate(prevProps){
 		if (prevProps.userData !== this.props.userData) {
-			if (this.props.userData.height !== 0){
-				this.setState({
-					height: this.props.userData.height,
-				});
-			} else {
-				this.setState({
-					height: 0,
-				});
-			}
+			this.setState({
+				height: this.props.userData.height || 0,
+			});
 		}
 	}
 
-	saveHeight = (props) => {
+	saveHeight = () => {
 		const height = parseFloat(this.state.height) || 0;
 		this.props.saveHeight(height);
 	}

@@ -8,12 +8,17 @@ class Measure extends Component {
 		super(props);
 
 		this.state = {
-			date: new Date(),
-			weight: 0,
-			waist: 0,
-			neck: 0,
-			bodyfat: 0,
-			userData: {},
+			newEntry: {
+				date: new Date((new Date()).toDateString()),
+				weight: 0,
+				waist: 0,
+				neck: 0,
+				bodyfat: 0,
+			},
+			userData: {
+				height: 0,
+				measurements: []
+			},
 		};
 
 	}
@@ -21,59 +26,126 @@ class Measure extends Component {
 	componentDidMount() {
 	}
 
-	componentDidUpdate(prevProps){
+	async componentDidUpdate(prevProps){
 		if (prevProps.userData !== this.props.userData) {
-			if (this.props.userData.measurements && this.props.userData.measurements.length > 0){
-				this.setState({
-					weight: this.props.userData.measurements[this.props.userData.measurements.length - 1].weight,
-					waist: this.props.userData.measurements[this.props.userData.measurements.length - 1].waist,
-					neck: this.props.userData.measurements[this.props.userData.measurements.length - 1].neck,
-					height: this.props.userData.height,
-				});
-			} else {
-				this.resetStateValues();
-			}
+			await this.setState({
+				userData: {...this.props.userData},
+			});
 		}
 	}
 
 	onInputChange = (event) => {
 		const name = event.target.name;
 		const value = event.target.value;
-		this.setState({
-			[name]: value
-			});
+
+		this.setState(prevState => {
+			let newEntry = Object.assign({}, prevState.newEntry);
+			newEntry[name] = value;
+			return { newEntry };
+		})
 	};
+
+	deleteMeasurement = async () => {
+		await this.resetStateValues();
+
+		const measurements = [...this.state.userData.measurements];
+		const index = measurements.findIndex((item) => this.state.newEntry.date.getTime() === new Date(item.date).getTime());
+		measurements.splice(index);
+
+		await this.setState(prevState => {
+			let userData = Object.assign({}, prevState.userData);
+			userData.measurements = measurements;
+			return { userData };
+		})
+
+		this.props.persistUserData(this.state.userData);
+	}
+
+	resetStateValues = async () => {
+		await this.setState(prevState => {
+			let newEntry = Object.assign({}, prevState.newEntry);
+			newEntry.weight = 0;
+			newEntry.waist = 0;
+			newEntry.neck = 0;
+			return { newEntry };
+		})
+	}
+
+	changeDateSelected = async (date) => {
+		await this.setState(prevState => {
+			let newEntry = Object.assign({}, prevState.newEntry);
+			newEntry.date = new Date(date.toDateString());
+			return { newEntry };
+		})
+
+		this.loadDateSelectedData();
+	}
+
+	loadDateSelectedData = () => {
+		const measurements = [...this.state.userData.measurements];
+		const index = measurements.findIndex((item) => new Date(item.date).getTime() === this.state.newEntry.date.getTime());
+
+		if (index === -1) {
+			this.resetStateValues();
+		} else {
+			this.setState(prevState => {
+				let newEntry = Object.assign({}, prevState.newEntry);
+				newEntry.weight = measurements[index].weight;
+				newEntry.waist = measurements[index].waist;
+				newEntry.neck = measurements[index].neck;
+				return { newEntry };
+			})
+		}
+	}
+
+	parseEnteredValues = async () => {
+		await this.setState(prevState => {
+			let newEntry = Object.assign({}, prevState.newEntry);
+			newEntry.weight = parseFloat(this.state.newEntry.weight) || 0;
+			newEntry.waist = parseFloat(this.state.newEntry.waist) || 0;
+			newEntry.neck = parseFloat(this.state.newEntry.neck) || 0;
+			return { newEntry };
+		})
+	}
+
+	storeBodyfat = async () => {
+		await this.setState(prevState => {
+			let newEntry = Object.assign({}, prevState.newEntry);
+			newEntry.bodyfat = this.calculateBodyfat(this.state.userData.height, this.state.newEntry.waist, this.state.newEntry.neck);
+			return { newEntry };
+		})
+	}
 
 	calculateBodyfat(height, waist, neck) {
 		const bodyfat = 495/(1.0324-0.19077*(Math.log10(waist-neck))+0.15456*(Math.log10(height)))-450;
 		return bodyfat.toFixed(2);
 	}
 
-	saveMeasurement = (props) => {
-		const weight = parseFloat(this.state.weight) || 0;
-		const waist = parseFloat(this.state.waist) || 0;
-		const neck = parseFloat(this.state.neck) || 0;
+	saveMeasurement = async () => {
+		await this.parseEnteredValues();
+		this.storeBodyfat();
 
-		const newMeasurement = {
-			date: (new Date().toISOString().split('T')[0]),
-			weight: parseFloat(weight),
-			waist: parseFloat(waist),
-			neck: parseFloat(neck),
-			bodyfat: parseFloat(this.calculateBodyfat(this.state.height, waist, neck)),
+		const measurements = [...this.state.userData.measurements];
+		const index = measurements.findIndex((item) => this.state.newEntry.date.getTime() >= new Date(item.date).getTime());
+		const updatedMeasurements = [...measurements];
+
+		if (index === -1) { // New entry not bigger or equal to any, insert in the front.
+			updatedMeasurements.unshift(this.state.newEntry);
+		} else { // Found a suitable place, add or update
+			if (this.state.newEntry.date.getTime() === new Date(measurements[index].date).getTime()) { // Entry exists, update
+				updatedMeasurements[index] = this.state.newEntry
+			} else if (this.state.newEntry.date.getTime() > new Date(measurements[index].date).getTime()) { // Entry doesn't exist, insert
+				updatedMeasurements.splice(index + 1, 0, this.state.newEntry);
+			}
 		}
-		this.props.saveNewMeasurement(newMeasurement);
-	}
+		
+		await this.setState(prevState => {
+			let userData = Object.assign({}, prevState.userData);
+			userData.measurements = updatedMeasurements;
+			return { userData };
+		})
 
-	deleteMeasurement = (props) => {
-		this.props.deleteMeasurement();
-	}
-
-	resetStateValues = () => {
-		this.setState({
-			weight: 0,
-			waist: 0,
-			neck: 0,
-		});
+		this.props.persistUserData(this.state.userData);
 	}
 
 	render() {
@@ -84,9 +156,10 @@ class Measure extends Component {
 
 				<div className="mt-3" style={{ display: "inline-block", width: "150px" }}>
 					<DatePicker 
-						disabled
+						dateFormat="dd/MM/yyyy"
 						className="form-control text-center"
-						selected={this.state.date}
+						selected={this.state.newEntry.date}
+						onChange={(date) => this.changeDateSelected(date)}
 					/>
 				</div>
 
@@ -103,7 +176,7 @@ class Measure extends Component {
 										type="number"
 										onChange={this.onInputChange}
 										name="weight"
-										value={this.state.weight}
+										value={this.state.newEntry.weight}
 									/>
 									<InputGroup.Text id="basic-addon2" className="measure-info-back">kg</InputGroup.Text>
 								</InputGroup>
@@ -120,7 +193,7 @@ class Measure extends Component {
 										type="number"
 										onChange={this.onInputChange}
 										name="waist"
-										value={this.state.waist}
+										value={this.state.newEntry.waist}
 									/>
 									<InputGroup.Text id="basic-addon2" className="measure-info-back">cm</InputGroup.Text>
 								</InputGroup>
@@ -137,7 +210,7 @@ class Measure extends Component {
 										type="number"
 										onChange={this.onInputChange}
 										name="neck"
-										value={this.state.neck}
+										value={this.state.newEntry.neck}
 									/>
 									<InputGroup.Text id="basic-addon2" className="measure-info-back">cm</InputGroup.Text>
 								</InputGroup>

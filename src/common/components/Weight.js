@@ -12,6 +12,7 @@ class Weight extends Component {
 			userData: {},
 			labels: [],
 			points: [],
+			chartData: [],
 		};
 	}
 
@@ -36,23 +37,29 @@ class Weight extends Component {
 	}
 
 	prepareData = (userData) => {
-		let labels = userData.measurements.map(item => item.date);
+
+		const chartData = userData.measurements.map(item => ({ x: new Date(item.date).toISOString().split('T')[0].replaceAll('-', '/'), y: item.weight }));
+		console.log(chartData);
+
+		let labels = userData.measurements.map(item => new Date(item.date).toISOString().split('T')[0]);
 		let points = userData.measurements.map(item => item.weight);
 
 		this.setState({
 			labels: labels,
 			points: points,
+			chartData: chartData,
 		});
 	}
 
 	render() {
 
 		const data = {
-			labels: this.state.labels,
+			// labels: this.state.labels,
 			datasets: [
 			  {
 				label: '# of Votes',
-				data: this.state.points,
+				// data: this.state.points,
+				data: this.state.chartData,
 				fill: false,
 				backgroundColor: 'rgb(255, 99, 132)',
 				borderColor: 'rgba(255, 99, 132, 0.2)',
@@ -61,13 +68,26 @@ class Weight extends Component {
 		  };
   
 		const options = {
+			responsive: true,
 			scales: {
 				yAxes: [
-					{
-						ticks: {
-							beginAtZero: true,
-						},
+				  {
+					ticks: {
+					  beginAtZero: true,
 					},
+				  },
+				],
+				xAxes: [
+					{
+						type: 'timeseries',
+						time: {
+							parser: "YYYY.MM.DD",
+							unit: 'month',
+							displayFormats: {
+								quarter: 'MMM YYYY'
+							}
+						}
+					}
 				],
 			},
 			plugins: {
@@ -83,7 +103,7 @@ class Weight extends Component {
 		return (
 			<Container className="mt-3 p-0">
 				<br></br>
-				<h3>Weight Progress</h3>
+				<h3>Weight Progress [kg]</h3>
 
 				<Row className="mt-3 justify-content-center">
 					<Col className="">

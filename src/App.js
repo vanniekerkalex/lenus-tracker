@@ -24,16 +24,8 @@ class App extends Component {
 		};
 	};
 
-	seedUserData = async () => {
-		localStorage.setItem('userData', JSON.stringify(this.state.seedUserData));
-		await this.setState({
-			userData: {...this.state.seedUserData}
-		});
-		console.log('User seed data has been loaded.')
-	}
-
 	async componentDidMount() {
-		const userData = JSON.parse(localStorage.getItem('userData'));
+		const userData = await JSON.parse(localStorage.getItem('userData'));
 		if (userData && userData.height !== 0){
 			console.log('User exists, retrieving data.');
 			await this.setState({
@@ -48,39 +40,35 @@ class App extends Component {
 		}
 	};
 
-	saveNewMeasurement = async (newMeasurment) => {
-		const newArray = [...this.state.userData.measurements];
-
-		if (this.state.userData.measurements 
-			&& this.state.userData.measurements.length > 0 
-			&& this.state.userData.measurements[this.state.userData.measurements.length - 1].date === newMeasurment.date) {
-			newArray.splice(this.state.userData.measurements.length - 1);
-		}
-		newArray.splice(newArray.length, 0, newMeasurment);
-		await this.setState(prevState => {
-			let userData = Object.assign({}, prevState.userData);
-			userData.measurements = newArray;
-			return { userData };
-		})
-		this.persistUserData();
+	seedUserData = async () => {
+		localStorage.setItem('userData', JSON.stringify(this.state.seedUserData));
+		await this.setState({
+			userData: {...this.state.seedUserData}
+		});
+		console.log('User seed data has been loaded.')
 	}
 
-	deleteMeasurement = async () => {
-		const today = (new Date().toISOString().split('T')[0]);
+	clearData = () => {
+		this.setState({
+			userData: {
+				height: 0,
+				measurements: []
+			},
+		})
+		console.log('All data has been cleared.');
+		localStorage.removeItem('userData');
+	}
 
-		if (this.state.userData.measurements
-			&& this.state.userData.measurements.length > 0 
-			&& this.state.userData.measurements[this.state.userData.measurements.length - 1].date === today) {
-				const newArray = [...this.state.userData.measurements];
-				newArray.splice(this.state.userData.measurements.length - 1);
-
-				await this.setState(prevState => {
-					let userData = Object.assign({}, prevState.userData);
-					userData.measurements = newArray;
-					return { userData };
-				})
-				this.persistUserData();
-			}
+	persistUserData = async (userDataProps) => {
+		if (userDataProps) {
+			await this.setState(prevState => {
+				let userData = Object.assign({}, prevState.userData);
+				userData = {...userDataProps};
+				return { userData };
+			})
+		}
+		console.log('Persisting user data changes to local storage.')
+		localStorage.setItem('userData', JSON.stringify(this.state.userData));
 	}
 
 	handleSelect = (key) => {
@@ -93,23 +81,8 @@ class App extends Component {
 			userData.height = height;
 			return { userData };
 		})
-		this.persistUserData();
-	}
-
-	persistUserData = () => {
-		console.log('Persisting user data changes to local storage.')
+		console.log('Persisting height to user data and local storage.')
 		localStorage.setItem('userData', JSON.stringify(this.state.userData));
-	}
-
-	clearData = () => {
-		this.setState({
-			userData: {
-				height: 0,
-				measurements: []
-			},
-		})
-		localStorage.removeItem('userData');
-		console.log('All data has been cleared.');
 	}
 	
 	render() {
@@ -121,9 +94,7 @@ class App extends Component {
 							<Tab eventKey="measure" title="Measure" disabled={this.state.userData.height === 0} >
 								<Measure
 									userData={this.state.userData}
-									dateInfo={this.state.dateInfo}
-									saveNewMeasurement={this.saveNewMeasurement}
-									deleteMeasurement={this.deleteMeasurement}
+									persistUserData={this.persistUserData}
 								/>
 							</Tab>
 							<Tab eventKey="weight" title="Weight" disabled={this.state.userData.height === 0} >
