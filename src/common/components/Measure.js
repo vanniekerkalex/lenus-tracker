@@ -14,6 +14,7 @@ class Measure extends Component {
 				date: convertDateToString(new Date()),
 				weight: 0,
 				waist: 0,
+				hips: 0,
 				neck: 0,
 				bodyfat: 0,
 			},
@@ -73,6 +74,7 @@ class Measure extends Component {
 			let newEntry = Object.assign({}, prevState.newEntry);
 			newEntry.weight = 0;
 			newEntry.waist = 0;
+			newEntry.hips = 0;
 			newEntry.neck = 0;
 			return { newEntry };
 		})
@@ -104,6 +106,7 @@ class Measure extends Component {
 				let newEntry = Object.assign({}, prevState.newEntry);
 				newEntry.weight = measurements[index].weight;
 				newEntry.waist = measurements[index].waist;
+				newEntry.hips = measurements[index].hips;
 				newEntry.neck = measurements[index].neck;
 				return { newEntry };
 			})
@@ -115,6 +118,7 @@ class Measure extends Component {
 			let newEntry = Object.assign({}, prevState.newEntry);
 			newEntry.weight = parseFloat(this.state.newEntry.weight) || 0;
 			newEntry.waist = parseFloat(this.state.newEntry.waist) || 0;
+			newEntry.hips = parseFloat(this.state.newEntry.hips) || 0;
 			newEntry.neck = parseFloat(this.state.newEntry.neck) || 0;
 			return { newEntry };
 		})
@@ -123,13 +127,21 @@ class Measure extends Component {
 	storeBodyfat = async () => {
 		await this.setState(prevState => {
 			let newEntry = Object.assign({}, prevState.newEntry);
-			newEntry.bodyfat = this.calculateBodyfat(this.state.userData.height, this.state.newEntry.waist, this.state.newEntry.neck);
+			newEntry.bodyfat = this.calculateBodyfat(this.state.userData.height, this.state.newEntry.waist, this.state.newEntry.hips,this.state.newEntry.neck);
 			return { newEntry };
 		})
 	}
 
-	calculateBodyfat(height, waist, neck) {
-		const bodyfat = 495/(1.0324-0.19077*(Math.log10(waist-neck))+0.15456*(Math.log10(height)))-450;
+	calculateBodyfat(height, waist, hips, neck) {
+
+		let bodyfat = 0;
+
+		if (this.state.userData.sex === 'male') {
+			bodyfat = 495/(1.0324-0.19077*(Math.log10(waist-neck))+0.15456*(Math.log10(height)))-450;
+		} else if (this.state.userData.sex === 'female') {
+			bodyfat=(495/(1.29579-0.35004*(Math.log10(waist+hips-neck))+0.221*(Math.log10(height)))-450);
+		}
+
 		return bodyfat.toFixed(2);
 	}
 
@@ -212,6 +224,25 @@ class Measure extends Component {
 								</InputGroup>
 							</Col>
 						</Row>
+						{ this.state.userData.sex === 'female' &&
+							<Row className="mt-3">
+								<Col>
+								<InputGroup className="mb-3">
+									<InputGroup.Text className="measure-info-front">Hips</InputGroup.Text>
+										<FormControl
+											placeholder="Hips"
+											aria-label="Hips"
+											aria-describedby="basic-addon2"
+											type="number"
+											onChange={this.onInputChange}
+											name="hips"
+											value={this.state.newEntry.hips}
+										/>
+										<InputGroup.Text id="basic-addon2" className="measure-info-back">cm</InputGroup.Text>
+									</InputGroup>
+								</Col>
+							</Row>
+						}
 						<Row className="mt-3">
 							<Col>
 							<InputGroup className="mb-3">

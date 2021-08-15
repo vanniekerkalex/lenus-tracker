@@ -1,12 +1,13 @@
 export const seedUserData = {
 		height: 181,
+		sex: "male",
 		measurements: [
 			{
 				"weight": 89,
 				"waist": 83,
 				"neck": 39.5,
 				"date": "2021-07-03",
-				"bodyfat": 16
+				"bodyfat": 16,
 			},
 			{
 				"weight": 88,

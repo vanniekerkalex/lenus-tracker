@@ -6,6 +6,7 @@ import Measure from './common/components/Measure';
 import Weight from './common/components/Weight';
 import Bodyfat from './common/components/Bodyfat';
 import Waist from './common/components/Waist';
+import Hips from './common/components/Hips';
 import Settings from './common/components/Settings';
 import seedUserData from './common/seedUserData';
 
@@ -19,6 +20,7 @@ class App extends Component {
 			seedUserData: seedUserData,
 			userData: {
 				height: 0,
+				sex: 'female',
 				measurements: []
 			},
 			key: '',
@@ -54,6 +56,7 @@ class App extends Component {
 		this.setState({
 			userData: {
 				height: 0,
+				sex: 'female',
 				measurements: []
 			},
 		})
@@ -77,10 +80,11 @@ class App extends Component {
 		this.setState({ key: key });
 	}
 
-	saveHeight = async (height) => {
+	saveHeightSex = async (height, sex) => {
 		await this.setState(prevState => {
 			let userData = Object.assign({}, prevState.userData);
 			userData.height = height;
+			userData.sex = sex;
 			return { userData };
 		})
 		console.log('Persisting height to user data and local storage.')
@@ -102,16 +106,21 @@ class App extends Component {
 							<Tab eventKey="weight" title="Weight" disabled={this.state.userData.height === 0} >
 								<Weight userData={this.state.userData} />
 							</Tab>
-							<Tab eventKey="bodyfat" title="Bodyfat" disabled={this.state.userData.height === 0}  >
-								<Bodyfat userData={this.state.userData} />
-							</Tab>
 							<Tab eventKey="waist" title="Waist" disabled={this.state.userData.height === 0}  >
 								<Waist userData={this.state.userData} />
+							</Tab>
+							{ this.state.userData.sex === 'female' &&
+								<Tab eventKey="hips" title="Hips" disabled={this.state.userData.height === 0}  >
+									<Hips userData={this.state.userData} />
+								</Tab>
+							}
+							<Tab eventKey="bodyfat" title="Bodyfat" disabled={this.state.userData.height === 0}  >
+								<Bodyfat userData={this.state.userData} />
 							</Tab>
 							<Tab eventKey="settings" title="Settings" >
 								<Settings 
 									userData={this.state.userData} 
-									saveHeight={this.saveHeight} 
+									saveHeightSex={this.saveHeightSex} 
 									clearData={this.clearData} 
 									seedUserData={this.seedUserData}
 								/>

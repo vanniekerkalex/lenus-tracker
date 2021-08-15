@@ -1,5 +1,5 @@
 import { React, Component } from "react";
-import { Container, Row, Col, Button, InputGroup, FormControl } from 'react-bootstrap';
+import { Container, Row, Col, Button, InputGroup, FormControl, Form } from 'react-bootstrap';
 import 'react-datepicker/dist/react-datepicker.css';
 
 class Measure extends Component {
@@ -8,6 +8,7 @@ class Measure extends Component {
 
 		this.state = {
 			height: 0,
+			sex: 'female'
 		};
 
 	}
@@ -16,13 +17,14 @@ class Measure extends Component {
 		if (prevProps.userData !== this.props.userData) {
 			this.setState({
 				height: this.props.userData.height || 0,
+				sex: this.props.userData.sex,
 			});
 		}
 	}
 
-	saveHeight = () => {
+	saveHeightSex = () => {
 		const height = parseFloat(this.state.height) || 0;
-		this.props.saveHeight(height);
+		this.props.saveHeightSex(height, this.state.sex);
 	}
 
 	onInputChange = (event) => {
@@ -31,7 +33,7 @@ class Measure extends Component {
 		this.setState({
 		  [name]: value
 		});
-	  };
+	};
 
 	render() {
 		return (
@@ -59,10 +61,21 @@ class Measure extends Component {
 								</InputGroup>
 							</Col>
 						</Row>
+						<Row className="mt-3">
+							<Col>
+								<InputGroup className="mb-3">
+									<InputGroup.Text className="measure-info-front">Sex</InputGroup.Text>
+									<Form.Select aria-label="Default select example" name="sex" value={this.state.sex} onChange={this.onInputChange} disabled={this.props.userData.height > 0} >
+										<option value="female">Female</option>
+										<option value="male">Male</option>
+									</Form.Select>
+								</InputGroup>
+							</Col>
+						</Row>
 						<br></br>
 						<Row className="mt-3">
 							<Col>
-								<Button style={{ width: "60px" }} onClick={this.saveHeight}>
+								<Button style={{ width: "60px" }} onClick={this.saveHeightSex}>
 									Save
 								</Button>
 							</Col>
