@@ -142,7 +142,7 @@ class Measure extends Component {
 		const index = measurements.findIndex((item) => selectedDate <= new Date(item.date).getTime());
 		const updatedMeasurements = [...measurements];
 
-		if (index === -1) { // New entry not bigger or equal to any, insert in the front.
+		if (index === -1) { // New entry doesn't exist or is later than all other entries, push onto stack
 			updatedMeasurements.push(this.state.newEntry);
 		} else { // Found a suitable place, add or update
 			if (selectedDate === new Date(measurements[index].date).getTime()) { // Entry exists, update

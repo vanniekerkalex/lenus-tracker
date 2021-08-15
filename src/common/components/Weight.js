@@ -58,14 +58,6 @@ class Weight extends Component {
 					},
 				  },
 				],
-				// xAxes: [
-				// 	{
-				// 		type: 'timeseries',
-				// 		time: {
-				// 			parser: 'YYYY-MM-DD',
-				// 		}
-				// 	}
-				// ],
 			},
 			plugins: {
 				legend: {

@@ -58,14 +58,6 @@ class Waist extends Component {
 					},
 				  },
 				],
-				// xAxes: [
-				// 	{
-				// 		type: 'time',
-				// 		time: {
-				// 			parser: 'YYYY-MM-DD',
-				// 		}
-				// 	}
-				// ],
 			},
 			plugins: {
 				legend: {

@@ -58,14 +58,6 @@ class Bodyfat extends Component {
 					},
 				  },
 				],
-				// xAxes: [
-				// 	{
-				// 		type: 'time',
-				// 		time: {
-				// 			parser: 'YYYY-MM-DD',
-				// 		}
-				// 	}
-				// ],
 			},
 			plugins: {
 				legend: {
