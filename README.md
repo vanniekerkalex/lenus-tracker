@@ -1,11 +1,11 @@
 # A lightweight weightloss and body composition tracker
 ## Created with React, Bootstrap and ChartJS
 
-This app starts by having the user enter their height. This will be used for bodyfat calculations. Once height has been entered (it can only be entered at the beginning so beware) and the user clicks `Save`, the user can click on the `Measure` tab. This will allow the user to enter new measurements once a day. A user is also able to delete the entry of the day or overwrite it. Once the day is over, the measurements are locked in for eternity! Or until the user clears all the data on the `Settings` tab :)
+This app starts by having the user enter their height. This will be used for bodyfat calculations. Once height has been entered and the user clicks `Save`, the user can click on the `Measure` tab. This will allow the user to add, edit or delete measurments.
 
-The tabs `Weight` and `Bodyfat` will graph the user's progress day by day according to date.
+The tabs `Weight`, `Bodyfat` and `Waist` will graph the user's progress according to date.
 
-On the `Settings` tab, the user can also `Clear Data` or `Seed User Data` for testing. When the user wants to add a daily measurement, the previously recorded values will be prefilled for ease of use as changes are usually not drastic.
+On the `Settings` tab, the user can also `Clear Data` or `Seed User Data` for testing.
 
 # Getting Started
 
