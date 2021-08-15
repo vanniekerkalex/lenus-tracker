@@ -1,9 +1,9 @@
 # A lightweight weightloss and body composition tracker
 ## Created with React, Bootstrap and ChartJS
 
-This app starts by having the user enter their height. This will be used for bodyfat calculations. Once height has been entered and the user clicks `Save`, the user can click on the `Measure` tab. This will allow the user to add, edit or delete measurments.
+This app starts by having the user enter their height and sex. Both height and sex will be used for bodyfat calculations. Once height and sex has been entered and the user clicks `Save`, the user can click on the `Measure` tab. This will allow the user to add, edit or delete measurments.
 
-The tabs `Weight`, `Bodyfat` and `Waist` will graph the user's progress according to date.
+The tabs `Weight`, `Waist`, `hips` (female only) and `Bodyfat` will graph the user's progress according to date.
 
 On the `Settings` tab, the user can also `Clear Data` or `Seed User Data` for testing.
 
