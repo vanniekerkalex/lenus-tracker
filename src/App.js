@@ -15,8 +15,6 @@ class App extends Component {
 		super(props);
 
 		this.state = {
-			measure: {
-			},
 			seedUserData: seedUserData,
 			userData: {
 				height: 0,

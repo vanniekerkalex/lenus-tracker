@@ -34,6 +34,7 @@ class Measure extends Component {
 			await this.setState({
 				userData: {...this.props.userData},
 			});
+			this.loadDateSelectedData();
 		}
 	}
 
@@ -139,7 +140,7 @@ class Measure extends Component {
 		if (this.state.userData.sex === 'male') {
 			bodyfat = 495/(1.0324-0.19077*(Math.log10(waist-neck))+0.15456*(Math.log10(height)))-450;
 		} else if (this.state.userData.sex === 'female') {
-			bodyfat=(495/(1.29579-0.35004*(Math.log10(waist+hips-neck))+0.221*(Math.log10(height)))-450);
+			bodyfat = 495/(1.29579-0.35004*(Math.log10(waist+hips-neck))+0.221*(Math.log10(height)))-450;
 		}
 
 		return bodyfat.toFixed(2);
@@ -201,7 +202,7 @@ class Measure extends Component {
 										type="number"
 										onChange={this.onInputChange}
 										name="weight"
-										value={this.state.newEntry.weight}
+										value={this.state.newEntry.weight || 0}
 									/>
 									<InputGroup.Text id="basic-addon2" className="measure-info-back">kg</InputGroup.Text>
 								</InputGroup>
@@ -218,7 +219,7 @@ class Measure extends Component {
 										type="number"
 										onChange={this.onInputChange}
 										name="waist"
-										value={this.state.newEntry.waist}
+										value={this.state.newEntry.waist || 0}
 									/>
 									<InputGroup.Text id="basic-addon2" className="measure-info-back">cm</InputGroup.Text>
 								</InputGroup>
@@ -236,7 +237,7 @@ class Measure extends Component {
 											type="number"
 											onChange={this.onInputChange}
 											name="hips"
-											value={this.state.newEntry.hips}
+											value={this.state.newEntry.hips || 0}
 										/>
 										<InputGroup.Text id="basic-addon2" className="measure-info-back">cm</InputGroup.Text>
 									</InputGroup>
@@ -254,7 +255,7 @@ class Measure extends Component {
 										type="number"
 										onChange={this.onInputChange}
 										name="neck"
-										value={this.state.newEntry.neck}
+										value={this.state.newEntry.neck || 0}
 									/>
 									<InputGroup.Text id="basic-addon2" className="measure-info-back">cm</InputGroup.Text>
 								</InputGroup>
